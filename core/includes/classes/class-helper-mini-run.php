@@ -42,14 +42,19 @@ class Helper_Mini_Run{
 	 */
 	private function add_hooks(){
 	
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_backend_scripts_and_styles' ), 20 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts_and_styles' ), 20 );
-		add_action( 'heartbeat_nopriv_received', array( $this, 'myplugin_receive_heartbeat' ), 20, 2 );
-		add_action( 'heartbeat_received', array( $this, 'myplugin_receive_heartbeat' ), 20, 2 );
-		add_action( 'plugins_loaded', array( $this, 'add_wp_webhooks_integrations' ), 9 );
-		add_filter( 'wpwhpro/admin/settings/menu_data', array( $this, 'add_main_settings_tabs' ), 20 );
-		add_action( 'wpwhpro/admin/settings/menu/place_content', array( $this, 'add_main_settings_content' ), 20 );
-	
+   add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_backend_scripts_and_styles' ), 20 );
+   add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts_and_styles' ), 20 );
+   add_action( 'heartbeat_nopriv_received', array( $this, 'myplugin_receive_heartbeat' ), 20, 2 );
+   add_action( 'heartbeat_received', array( $this, 'myplugin_receive_heartbeat' ), 20, 2 );
+   add_action( 'plugins_loaded', array( $this, 'add_wp_webhooks_integrations' ), 9 );
+   add_filter( 'wpwhpro/admin/settings/menu_data', array( $this, 'add_main_settings_tabs' ), 20 );
+   add_action( 'wpwhpro/admin/settings/menu/place_content', array( $this, 'add_main_settings_content' ), 20 );
+
+   // Add custom columns to network sites table (only in network admin)
+   if ( is_multisite() && is_network_admin() ) {
+	   add_filter( 'wpmu_blogs_columns', array( 'Helper_Mini_Helpers', 'add_network_sites_columns' ) );
+	   add_action( 'manage_sites_custom_column', array( 'Helper_Mini_Helpers', 'render_network_sites_custom_column' ), 10, 2 );
+   }
 	}
 
 	/**
