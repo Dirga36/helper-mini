@@ -17,7 +17,7 @@ Backend related javascript
 			return;
 		}
 	
-		alert( 'The hash is ' + data.myplugin_customfield_hashed );
+		//alert( 'The hash is ' + data.myplugin_customfield_hashed );
 	});
 
 })( jQuery );
