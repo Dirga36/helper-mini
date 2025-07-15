@@ -9,7 +9,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:   Helper Mini
- * Plugin URI:    https://mydomain.com
+ * Plugin URI:    https://github.com/Dirga36/helper-mini.git
  * Description:   Small helper for admin
  * Version:       1.0.0
  * Author:        Dirga
