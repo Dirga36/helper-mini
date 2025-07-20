@@ -1,7 +1,7 @@
 <?php
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (! defined('ABSPATH')) exit;
 
 /**
  * Class Helper_Mini_Helpers
@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @author		Dirga
  * @since		1.0.0
  */
-class Helper_Mini_Helpers{
+class Helper_Mini_Helpers
+{
 
 	/**
 	 * ######################
@@ -27,7 +28,8 @@ class Helper_Mini_Helpers{
 	/**
 	 * Add custom columns to the network sites table.
 	 */
-	public static function add_network_sites_columns($columns) {
+	public static function add_network_sites_columns($columns)
+	{
 		$columns['post_count'] = __('Posts', 'helper-mini');
 		$columns['page_count'] = __('Pages', 'helper-mini');
 		$columns['users_list'] = __('Users', 'helper-mini');
@@ -37,7 +39,8 @@ class Helper_Mini_Helpers{
 	/**
 	 * Render custom columns content for the network sites table.
 	 */
-	public static function render_network_sites_custom_column($column_name, $blog_id) {
+	public static function render_network_sites_custom_column($column_name, $blog_id)
+	{
 		switch ($column_name) {
 			case 'post_count':
 				switch_to_blog($blog_id);
@@ -59,4 +62,35 @@ class Helper_Mini_Helpers{
 		}
 	}
 
+	/**
+	 * Add custom Bulk action: "deactivate" to the network sites table.
+	 */
+	public static function add_network_sites_bulk_actions($actions)
+	{
+		$actions['deactivate'] = __('Deactivate', 'helper-mini');
+		return $actions;
+	}
+
+	/**
+	 * Handle the custom Bulk action: "deactivate" for network sites.
+	 */
+	public static function handle_network_sites_bulk_action($redirect_to, $doaction, $site_ids)
+	{
+		if ($doaction !== 'deactivate') {
+			return $redirect_to;
+		}
+
+		if (! is_array($site_ids)) {
+			$site_ids = array($site_ids);
+		}
+
+		foreach ($site_ids as $site_id) {
+			if (get_network()->site_id != $site_id) { // Prevent deactivating main site
+				update_blog_status($site_id, 'public', 0);
+			}
+		}
+
+		$redirect_to = add_query_arg('bulk_deactivated', count($site_ids), $redirect_to);
+		return $redirect_to;
+	}
 }
