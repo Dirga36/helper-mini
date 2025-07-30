@@ -1,7 +1,7 @@
 <?php
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (! defined('ABSPATH')) exit;
 
 /**
  * Class Helper_Mini_Helpers
@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @author		Dirga
  * @since		1.0.0
  */
-class Helper_Mini_Helpers{
+class Helper_Mini_Helpers
+{
 
 	/**
 	 * ######################
@@ -27,7 +28,8 @@ class Helper_Mini_Helpers{
 	/**
 	 * Add custom columns to the network sites table.
 	 */
-	public static function add_network_sites_columns($columns) {
+	public static function add_network_sites_columns($columns)
+	{
 		$columns['post_count'] = __('Posts', 'helper-mini');
 		$columns['page_count'] = __('Pages', 'helper-mini');
 		$columns['users_list'] = __('Users', 'helper-mini');
@@ -37,7 +39,8 @@ class Helper_Mini_Helpers{
 	/**
 	 * Render custom columns content for the network sites table.
 	 */
-	public static function render_network_sites_custom_column($column_name, $blog_id) {
+	public static function render_network_sites_custom_column($column_name, $blog_id)
+	{
 		switch ($column_name) {
 			case 'post_count':
 				switch_to_blog($blog_id);
@@ -58,5 +61,4 @@ class Helper_Mini_Helpers{
 				break;
 		}
 	}
-
 }
