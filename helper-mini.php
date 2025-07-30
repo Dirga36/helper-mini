@@ -5,7 +5,7 @@
  * @package       HELPERMINI
  * @author        Dirga
  * @license       gplv2-or-later
- * @version       1.0.0
+ * @version       1.2.0
  *
  * @wordpress-plugin
  * Plugin Name:   Helper Mini

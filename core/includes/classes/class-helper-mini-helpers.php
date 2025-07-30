@@ -61,4 +61,36 @@ class Helper_Mini_Helpers
 				break;
 		}
 	}
+
+	/**
+	 * Add custom Bulk action: "deactivate" to the network sites table.
+	 */
+	public static function add_network_sites_bulk_actions($actions)
+	{
+		$actions['deactivate'] = __('Deactivate', 'helper-mini');
+		return $actions;
+	}
+
+	/**
+	 * Handle the custom Bulk action: "deactivate" for network sites.
+	 */
+	public static function handle_network_sites_bulk_action($redirect_to, $doaction, $site_ids)
+	{
+		if ($doaction !== 'deactivate') {
+			return $redirect_to;
+		}
+
+		if (! is_array($site_ids)) {
+			$site_ids = array($site_ids);
+		}
+
+		foreach ($site_ids as $site_id) {
+			if (get_network()->site_id != $site_id) { // Prevent deactivating main site
+				update_blog_status($site_id, 'public', 0);
+			}
+		}
+
+		$redirect_to = add_query_arg('bulk_deactivated', count($site_ids), $redirect_to);
+		return $redirect_to;
+	}
 }
