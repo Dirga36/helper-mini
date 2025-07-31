@@ -1,96 +1,138 @@
 <?php
 
 // Exit if accessed directly.
-if (! defined('ABSPATH')) exit;
-
-/**
- * Class Helper_Mini_Helpers
- *
- * This class contains repetitive functions that
- * are used globally within the plugin.
- *
- * @package		HELPERMINI
- * @subpackage	Classes/Helper_Mini_Helpers
- * @author		Dirga
- * @since		1.0.0
- */
-class Helper_Mini_Helpers
-{
+if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! class_exists( 'Helper_Mini' ) ) :
 
 	/**
-	 * ######################
-	 * ###
-	 * #### CALLABLE FUNCTIONS
-	 * ###
-	 * ######################
+	 * Main Helper_Mini Class.
+	 *
+	 * @package		HELPERMINI
+	 * @subpackage	Classes/Helper_Mini
+	 * @since		1.0.0
+	 * @author		Dirga
 	 */
+	final class Helper_Mini {
 
-	/**
-	 * Add custom columns to the network sites table.
-	 */
-	public static function add_network_sites_columns($columns)
-	{
-		$columns['post_count'] = __('Posts', 'helper-mini');
-		$columns['page_count'] = __('Pages', 'helper-mini');
-		$columns['users_list'] = __('Users', 'helper-mini');
-		return $columns;
-	}
+		/**
+		 * The real instance
+		 *
+		 * @access	private
+		 * @since	1.0.0
+		 * @var		object|Helper_Mini
+		 */
+		private static $instance;
 
-	/**
-	 * Render custom columns content for the network sites table.
-	 */
-	public static function render_network_sites_custom_column($column_name, $blog_id)
-	{
-		switch ($column_name) {
-			case 'post_count':
-				switch_to_blog($blog_id);
-				$count = wp_count_posts('post');
-				echo intval($count->publish);
-				restore_current_blog();
-				break;
-			case 'page_count':
-				switch_to_blog($blog_id);
-				$count = wp_count_posts('page');
-				echo intval($count->publish);
-				restore_current_blog();
-				break;
-			case 'users_list':
-				$users = get_users(array('blog_id' => $blog_id, 'fields' => array('display_name')));
-				$names = wp_list_pluck($users, 'display_name');
-				echo esc_html(implode(', ', $names));
-				break;
-		}
-	}
+		/**
+		 * HELPERMINI helpers object.
+		 *
+		 * @access	public
+		 * @since	1.0.0
+		 * @var		object|Helper_Mini_Helpers
+		 */
+		public $helpers;
 
-	/**
-	 * Add custom Bulk action: "deactivate" to the network sites table.
-	 */
-	public static function add_network_sites_bulk_actions($actions)
-	{
-		$actions['deactivate_blog'] = __('Deactivate', 'helper-mini');
-		return $actions;
-	}
+		/**
+		 * HELPERMINI settings object.
+		 *
+		 * @access	public
+		 * @since	1.0.0
+		 * @var		object|Helper_Mini_Settings
+		 */
+		public $settings;
 
-	/**
-	 * Handle the custom Bulk action: "deactivate" for network sites.
-	 */
-	public static function handle_network_sites_bulk_action($redirect_to, $doaction, $site_ids)
-	{
-		if ($doaction !== 'deactivate_blog') {
-			return $redirect_to;
+		/**
+		 * Throw error on object clone.
+		 *
+		 * Cloning instances of the class is forbidden.
+		 *
+		 * @access	public
+		 * @since	1.0.0
+		 * @return	void
+		 */
+		public function __clone() {
+			_doing_it_wrong( __FUNCTION__, __( 'You are not allowed to clone this class.', 'helper-mini' ), '1.0.0' );
 		}
 
-		if (! is_array($site_ids)) {
-			$site_ids = array($site_ids);
+		/**
+		 * Disable unserializing of the class.
+		 *
+		 * @access	public
+		 * @since	1.0.0
+		 * @return	void
+		 */
+		public function __wakeup() {
+			_doing_it_wrong( __FUNCTION__, __( 'You are not allowed to unserialize this class.', 'helper-mini' ), '1.0.0' );
 		}
 
-		foreach ($site_ids as $site_id) {
-			if (get_network()->site_id != $site_id) { // Prevent deactivating main site
-				update_blog_status($site_id, 'deleted', '1');
+		/**
+		 * Main Helper_Mini Instance.
+		 *
+		 * Insures that only one instance of Helper_Mini exists in memory at any one
+		 * time. Also prevents needing to define globals all over the place.
+		 *
+		 * @access		public
+		 * @since		1.0.0
+		 * @static
+		 * @return		object|Helper_Mini	The one true Helper_Mini
+		 */
+		public static function instance() {
+			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Helper_Mini ) ) {
+				self::$instance					= new Helper_Mini;
+				self::$instance->base_hooks();
+				self::$instance->includes();
+				self::$instance->helpers		= new Helper_Mini_Helpers();
+				self::$instance->settings		= new Helper_Mini_Settings();
+
+				//Fire the plugin logic
+				new Helper_Mini_Run();
+
+				/**
+				 * Fire a custom action to allow dependencies
+				 * after the successful plugin setup
+				 */
+				do_action( 'HELPERMINI/plugin_loaded' );
 			}
+
+			return self::$instance;
 		}
 
-		$redirect_to = add_query_arg('bulk_deactivated', count($site_ids), $redirect_to);
-		return $redirect_to;
+		/**
+		 * Include required files.
+		 *
+		 * @access  private
+		 * @since   1.0.0
+		 * @return  void
+		 */
+		private function includes() {
+			require_once HELPERMINI_PLUGIN_DIR . 'core/includes/classes/class-helper-mini-helpers.php';
+			require_once HELPERMINI_PLUGIN_DIR . 'core/includes/classes/class-helper-mini-settings.php';
+
+			require_once HELPERMINI_PLUGIN_DIR . 'core/includes/classes/class-helper-mini-run.php';
+		}
+
+		/**
+		 * Add base hooks for the core functionality
+		 *
+		 * @access  private
+		 * @since   1.0.0
+		 * @return  void
+		 */
+		private function base_hooks() {
+			add_action( 'plugins_loaded', array( self::$instance, 'load_textdomain' ) );
+		}
+
+		/**
+		 * Loads the plugin language files.
+		 *
+		 * @access  public
+		 * @since   1.0.0
+		 * @return  void
+		 */
+		public function load_textdomain() {
+			load_plugin_textdomain( 'helper-mini', FALSE, dirname( plugin_basename( HELPERMINI_PLUGIN_FILE ) ) . '/languages/' );
+		}
+
 	}
-}
+
+endif; // End if class_exists check.
