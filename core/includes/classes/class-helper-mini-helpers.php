@@ -1,138 +1,114 @@
 <?php
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) exit;
-if ( ! class_exists( 'Helper_Mini' ) ) :
+if (! defined('ABSPATH')) exit;
+
+/**
+ * Class Helper_Mini_Helpers
+ *
+ * This class contains repetitive functions that
+ * are used globally within the plugin.
+ *
+ * @package		HELPERMINI
+ * @subpackage	Classes/Helper_Mini_Helpers
+ * @author		Dirga
+ * @since		1.0.0
+ */
+class Helper_Mini_Helpers
+{
 
 	/**
-	 * Main Helper_Mini Class.
-	 *
-	 * @package		HELPERMINI
-	 * @subpackage	Classes/Helper_Mini
-	 * @since		1.0.0
-	 * @author		Dirga
+	 * ######################
+	 * ###
+	 * #### CALLABLE FUNCTIONS
+	 * ###
+	 * ######################
 	 */
-	final class Helper_Mini {
 
-		/**
-		 * The real instance
-		 *
-		 * @access	private
-		 * @since	1.0.0
-		 * @var		object|Helper_Mini
-		 */
-		private static $instance;
-
-		/**
-		 * HELPERMINI helpers object.
-		 *
-		 * @access	public
-		 * @since	1.0.0
-		 * @var		object|Helper_Mini_Helpers
-		 */
-		public $helpers;
-
-		/**
-		 * HELPERMINI settings object.
-		 *
-		 * @access	public
-		 * @since	1.0.0
-		 * @var		object|Helper_Mini_Settings
-		 */
-		public $settings;
-
-		/**
-		 * Throw error on object clone.
-		 *
-		 * Cloning instances of the class is forbidden.
-		 *
-		 * @access	public
-		 * @since	1.0.0
-		 * @return	void
-		 */
-		public function __clone() {
-			_doing_it_wrong( __FUNCTION__, __( 'You are not allowed to clone this class.', 'helper-mini' ), '1.0.0' );
-		}
-
-		/**
-		 * Disable unserializing of the class.
-		 *
-		 * @access	public
-		 * @since	1.0.0
-		 * @return	void
-		 */
-		public function __wakeup() {
-			_doing_it_wrong( __FUNCTION__, __( 'You are not allowed to unserialize this class.', 'helper-mini' ), '1.0.0' );
-		}
-
-		/**
-		 * Main Helper_Mini Instance.
-		 *
-		 * Insures that only one instance of Helper_Mini exists in memory at any one
-		 * time. Also prevents needing to define globals all over the place.
-		 *
-		 * @access		public
-		 * @since		1.0.0
-		 * @static
-		 * @return		object|Helper_Mini	The one true Helper_Mini
-		 */
-		public static function instance() {
-			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Helper_Mini ) ) {
-				self::$instance					= new Helper_Mini;
-				self::$instance->base_hooks();
-				self::$instance->includes();
-				self::$instance->helpers		= new Helper_Mini_Helpers();
-				self::$instance->settings		= new Helper_Mini_Settings();
-
-				//Fire the plugin logic
-				new Helper_Mini_Run();
-
-				/**
-				 * Fire a custom action to allow dependencies
-				 * after the successful plugin setup
-				 */
-				do_action( 'HELPERMINI/plugin_loaded' );
-			}
-
-			return self::$instance;
-		}
-
-		/**
-		 * Include required files.
-		 *
-		 * @access  private
-		 * @since   1.0.0
-		 * @return  void
-		 */
-		private function includes() {
-			require_once HELPERMINI_PLUGIN_DIR . 'core/includes/classes/class-helper-mini-helpers.php';
-			require_once HELPERMINI_PLUGIN_DIR . 'core/includes/classes/class-helper-mini-settings.php';
-
-			require_once HELPERMINI_PLUGIN_DIR . 'core/includes/classes/class-helper-mini-run.php';
-		}
-
-		/**
-		 * Add base hooks for the core functionality
-		 *
-		 * @access  private
-		 * @since   1.0.0
-		 * @return  void
-		 */
-		private function base_hooks() {
-			add_action( 'plugins_loaded', array( self::$instance, 'load_textdomain' ) );
-		}
-
-		/**
-		 * Loads the plugin language files.
-		 *
-		 * @access  public
-		 * @since   1.0.0
-		 * @return  void
-		 */
-		public function load_textdomain() {
-			load_plugin_textdomain( 'helper-mini', FALSE, dirname( plugin_basename( HELPERMINI_PLUGIN_FILE ) ) . '/languages/' );
-		}
-
+	/**
+	 * Add custom columns to the network sites table.
+	 */
+	public static function add_network_sites_columns($columns)
+	{
+		$columns['post_count'] = __('Posts', 'helper-mini');
+		$columns['page_count'] = __('Pages', 'helper-mini');
+		$columns['users_list'] = __('Users', 'helper-mini');
+		return $columns;
 	}
 
-endif; // End if class_exists check.
+	/**
+	 * Render custom columns content for the network sites table.
+	 */
+	public static function render_network_sites_custom_column($column_name, $blog_id)
+	{
+		switch ($column_name) {
+			case 'post_count':
+				switch_to_blog($blog_id);
+				$count = wp_count_posts('post');
+				echo intval($count->publish);
+				restore_current_blog();
+				break;
+			case 'page_count':
+				switch_to_blog($blog_id);
+				$count = wp_count_posts('page');
+				echo intval($count->publish);
+				restore_current_blog();
+				break;
+			case 'users_list':
+				$users = get_users(array('blog_id' => $blog_id, 'fields' => array('display_name')));
+				$names = wp_list_pluck($users, 'display_name');
+				echo esc_html(implode(', ', $names));
+				break;
+		}
+	}
+
+	/**
+	 * Add custom Bulk action: "deactivate" to the network sites table.
+	 */
+	public static function add_network_sites_bulk_actions($actions)
+	{
+		$actions['deactivate_blog'] = __('Deactivate', 'helper-mini');
+		return $actions;
+	}
+
+	/**
+	 * Handle the custom Bulk action: "deactivate" for network sites.
+	 */
+	public static function handle_network_sites_bulk_action($redirect_to, $doaction, $site_ids)
+	{
+		if ($doaction !== 'deactivate_blog') {
+			return $redirect_to;
+		}
+
+		if (! is_array($site_ids)) {
+			$site_ids = array($site_ids);
+		}
+
+		// Loop through each site in the network, except the main site
+		foreach ($site_ids as $site_id) {
+			$network_main_id = get_network()->site_id;
+			if ($network_main_id === $site_id) {
+				continue; // Skip main site
+			}
+
+			// Move context to child site for content evaluation
+			switch_to_blog($site_id);
+			$post_count = wp_count_posts('post');
+			$page_count = wp_count_posts('page');
+
+			$num_posts = isset($post_count->publish) ? intval($post_count->publish) : 0;
+			$num_pages = isset($page_count->publish) ? intval($page_count->publish) : 0;
+
+			// Return context to the original blog before next action
+			restore_current_blog();
+
+			// If the site is meet the requirements below, mark it as "deleted"
+			if ($num_posts <= 2 && $num_pages <= 2) {
+				update_blog_status($site_id, 'deleted', '1');
+			}
+		}
+
+		$redirect_to = add_query_arg('bulk_deactivated', count($site_ids), $redirect_to);
+		return $redirect_to;
+	}
+}
