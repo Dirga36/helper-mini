@@ -62,7 +62,7 @@ class Helper_Mini_Run
 			add_filter('bulk_actions-sites-network', array('Helper_Mini_Helpers', 'add_network_sites_bulk_actions'));
 
 			// Handle the bulk action
-			add_filter('handle_bulk_actions-sites-network', array('Helper_Mini_Helpers', 'handle_network_sites_bulk_action'), 10, 3);
+			add_filter('handle_network_bulk_actions-sites-network', array('Helper_Mini_Helpers', 'handle_network_sites_bulk_action'), 10, 3);
 
 			// Optional: Show admin notice after action
 			add_action('network_admin_notices', function () {
