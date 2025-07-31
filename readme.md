@@ -5,9 +5,9 @@ Donate link:
 Contributors: Dirga
 Tags: helper
 Requires at least: 6.8.1
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 8
-Stable tag: 1.0.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,10 +15,9 @@ Small helper for admin
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
-
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+A wordpress plugin for add some functionality/feature to Network Admin, mostly in subsite management. There are some features:
+- display post and page count of a site in a sites table
+- Bulk action to deactivate selected sites (but this feature has default rule: site that have <= 2 post and page count)
 
 A few notes about the sections above:
 
@@ -43,7 +42,7 @@ you put the stable version, in order to eliminate any doubt.
 
 == Frequently Asked Questions ==
 
-Just small helper
+Just small helper for network admin
 
 == Installation ==
 
