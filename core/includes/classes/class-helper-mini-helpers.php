@@ -67,7 +67,7 @@ class Helper_Mini_Helpers
 	 */
 	public static function add_network_sites_bulk_actions($actions)
 	{
-		$actions['deactivate'] = __('Deactivate', 'helper-mini');
+		$actions['deactivate_blog'] = __('Deactivate', 'helper-mini');
 		return $actions;
 	}
 
@@ -76,7 +76,7 @@ class Helper_Mini_Helpers
 	 */
 	public static function handle_network_sites_bulk_action($redirect_to, $doaction, $site_ids)
 	{
-		if ($doaction !== 'deactivate') {
+		if ($doaction !== 'deactivate_blog') {
 			return $redirect_to;
 		}
 
@@ -86,7 +86,7 @@ class Helper_Mini_Helpers
 
 		foreach ($site_ids as $site_id) {
 			if (get_network()->site_id != $site_id) { // Prevent deactivating main site
-				update_blog_status($site_id, 'public', 0);
+				update_blog_status($site_id, 'deleted', '1');
 			}
 		}
 
