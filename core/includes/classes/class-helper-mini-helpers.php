@@ -84,6 +84,8 @@ class Helper_Mini_Helpers
 			$site_ids = array($site_ids);
 		}
 
+		$deleted_sites = 0;
+
 		// Loop through each site in the network, except the main site
 		foreach ($site_ids as $site_id) {
 			$network_main_id = get_network()->site_id;
@@ -102,13 +104,14 @@ class Helper_Mini_Helpers
 			// Return context to the original blog before next action
 			restore_current_blog();
 
-			// If the site is meet the requirements below, mark it as "deleted"
+			// If the site meets the requirements, mark it as "deleted"
 			if ($num_posts <= 2 && $num_pages <= 2) {
 				update_blog_status($site_id, 'deleted', '1');
+				$deleted_sites++; // Increment count for sites that are deleted
 			}
 		}
 
-		$redirect_to = add_query_arg('bulk_deactivated', count($site_ids), $redirect_to);
+		$redirect_to = add_query_arg('bulk_deactivated', $deleted_sites, $redirect_to);
 		return $redirect_to;
 	}
 }
