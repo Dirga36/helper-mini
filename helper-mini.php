@@ -11,7 +11,7 @@
  * Plugin Name:   Helper Mini
  * Plugin URI:    https://github.com/Dirga36/helper-mini.git
  * Description:   Small helper for admin
- * Version:       1.0.0
+ * Version:       1.2.0
  * Author:        Dirga
  * Author URI:    https://github.com/Dirga36
  * Text Domain:   helper-mini
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'HELPERMINI_NAME',			'Helper Mini' );
 
 // Plugin version
-define( 'HELPERMINI_VERSION',		'1.0.0' );
+define( 'HELPERMINI_VERSION',		'1.2.0' );
 
 // Plugin Root File
 define( 'HELPERMINI_PLUGIN_FILE',	__FILE__ );
@@ -53,7 +53,7 @@ require_once HELPERMINI_PLUGIN_DIR . 'core/class-helper-mini.php';
  * of our master class.
  *
  * @author  Dirga
- * @since   1.0.0
+ * @since   1.2.0
  * @return  object|Helper_Mini
  */
 function HELPERMINI() {
