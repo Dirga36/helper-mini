@@ -55,8 +55,11 @@ class Helper_Mini_Run
 
 		// Add custom columns to network sites table (only in network admin)
 		if (is_multisite() && is_network_admin()) {
-			add_filter('wpmu_blogs_columns', array('Helper_Mini_Helpers', 'add_network_sites_columns'));
-			add_action('manage_sites_custom_column', array('Helper_Mini_Helpers', 'render_network_sites_custom_column'), 10, 2);
+			// Add column
+			add_filter('manage_sites-network_columns', ['Helper_Mini_Helpers', 'add_network_sites_columns']);
+			add_action('manage_sites_custom_column', ['Helper_Mini_Helpers', 'render_network_sites_custom_column'], 10, 2);
+
+			//-----------------------------------------------------------------------------------------------------------------------------------------------
 
 			// Add bulk action to the dropdown
 			add_filter('bulk_actions-sites-network', array('Helper_Mini_Helpers', 'add_network_sites_bulk_actions'));
@@ -66,10 +69,24 @@ class Helper_Mini_Run
 
 			// Optional: Show admin notice after action
 			add_action('network_admin_notices', function () {
-				if (isset($_REQUEST['bulk_deactivated'])) {
+				if (isset($_REQUEST['deactivated_sites'])) {
 					printf(
 						'<div id="message" class="updated notice is-dismissible"><p>%s</p></div>',
-						esc_html(sprintf(__('Deactivated %s site(s).', 'helper-mini'), intval($_REQUEST['bulk_deactivated'])))
+						esc_html(sprintf(__('Deactivated %s site(s).', 'helper-mini'), intval($_REQUEST['deactivated_sites'])))
+					);
+				}
+
+				if (isset($_REQUEST['destroyed_sites'])) {
+					printf(
+						'<div id="message" class="updated notice is-dismissible"><p>%s</p></div>',
+						esc_html(sprintf(__('Deleted %s site(s).', 'helper-mini'), intval($_REQUEST['destroyed_sites'])))
+					);
+				}
+
+				if (isset($_REQUEST['activated_sites'])) {
+					printf(
+						'<div id="message" class="updated notice is-dismissible"><p>%s</p></div>',
+						esc_html(sprintf(__('Activated %s site(s).', 'helper-mini'), intval($_REQUEST['activated_sites'])))
 					);
 				}
 			});
