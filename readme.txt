@@ -1,7 +1,5 @@
 === Helper Mini ===
 Author URI: https://github.com/Dirga36
-Plugin URI: https://mydomain.com
-Donate link: 
 Contributors: Dirga
 Tags: helper
 Requires at least: 6.8.1
